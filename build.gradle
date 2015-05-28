@@ -1,0 +1,19 @@
+repositories{
+  mavenCentral()
+}
+
+apply plugin: "java"
+
+dependencies {
+
+}
+
+sourceSets {
+  main.java.srcDir "src"
+}
+
+jar {
+  from configurations.compile.collect {
+    zipTree it
+  }
+}
