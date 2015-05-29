@@ -18,7 +18,7 @@ public class Output {
 	 */
 	public static String getHTMLOutput() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("<textarea rows=\"20\" cols=\"50\">");
+		builder.append("<textarea readonly rows=\"20\" cols=\"50\">");
 		builder.append(getOutput());
 		builder.append("</textarea>");
 		return builder.toString();

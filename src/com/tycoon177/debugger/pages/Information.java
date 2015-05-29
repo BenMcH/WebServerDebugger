@@ -17,16 +17,16 @@ public class Information implements Page {
 		double seconds = (System.currentTimeMillis() - startTime) / 1000.0;
 		double minutes = seconds / 60.0;
 		double hours = minutes / 60.0;
-		String timestamp = ((int) hours) + "h " + (minutes % 60) + "m " + (seconds % 60) + "s";
+		String timestamp = ((int) hours) + "h " + (int)(minutes) + "m " + (int)(seconds % 60) + "s";
 		return timestamp;
 	}
 
 	@Override
-	public String getHTMLOutput() {
+	public String getHTMLOutput(String argument) {
 		StringBuilder output = new StringBuilder("");
 		output.append("<html><body><center>Uptime: ");
 		output.append(getUptime());
-		output.append("<br><br>");
+		output.append("<br><br><b>Program Output:</b><br>");
 		output.append(Output.getHTMLOutput());
 		output.append("</center></body></html>");
 		return output.toString();

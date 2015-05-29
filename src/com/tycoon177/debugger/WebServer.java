@@ -5,17 +5,18 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 
+import com.tycoon177.debugger.http.Client;
 import com.tycoon177.debugger.output.Output;
 import com.tycoon177.debugger.pages.Functions;
 import com.tycoon177.debugger.pages.Information;
 import com.tycoon177.debugger.pages.Page;
 
-public class WebServer {
+public class WebServer implements Runnable {
 	private ServerSocket socket;
 	private int portNum;
 	private int backlogNum;
 	private boolean started = false;
-	private HashMap<String, Page> pages;
+	public static HashMap<String, Page> pages;
 	private Thread thread;
 
 	/**
@@ -43,11 +44,12 @@ public class WebServer {
 	public WebServer(int port, int backlog) {
 		setupServer(port, backlog);
 		pages = new HashMap<String, Page>();
+		pages.put(" ", new Information());
 		pages.put("info", new Information());
 		pages.put("functions", new Functions());
-		Functions.addFunction("restartWebServer", () -> restartServer());
-		Functions.addFunction("stopWebServer", () -> stopServer());
-		Functions.addFunction("stopProgram", () -> System.exit(0));
+		Functions.addFunction("restartserver", () -> restartServer());
+		Functions.addFunction("stopserver", () -> stopServer());
+		Functions.addFunction("shutdown", () -> System.exit(0));
 	}
 
 	/**
@@ -65,17 +67,8 @@ public class WebServer {
 			Output.println("Server failed to start on port " + port);
 			started = false;
 		}
-		thread = new Thread(() -> {
-			while (started) {
-				Socket s = null;
-				try {
-					s = socket.accept();
-				} catch (Exception e) {
-					Output.println("Failed to connect to a client");
-				}
-			}
-		});
-
+		thread = new Thread(this);
+		thread.start();
 		this.portNum = port;
 		this.backlogNum = backlog;
 		if (started)
@@ -115,5 +108,18 @@ public class WebServer {
 	 */
 	public void addPage(String path, Page page) {
 		pages.put(path, page);
+	}
+
+	public void run() {
+		while (started) {
+			Socket s = null;
+			try {
+				s = socket.accept();
+			} catch (IOException e) {
+			}
+			if (s == null)
+				continue;
+			new Thread(new Client(s), "Client Thread").start();
+		}
 	}
 }
